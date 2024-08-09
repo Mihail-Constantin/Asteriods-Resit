@@ -324,7 +324,6 @@ void Asteroids::GameStart()
 	StartLabel->SetVisible(false);
 	HighScoreLabel->SetVisible(false);
 	QuitLabel->SetVisible(false);
-	HighScoreTable->SetVisible(false);
 	GameSession::Start();
 }
 
@@ -378,10 +377,10 @@ void Asteroids::OnPlayerKilled(int lives_left)
 
 void Asteroids::WriteScoreToFIle()
 {
-	std::ofstream myFile("HighScore.txt");
+	std::ofstream myFile("HighScore.txt", std::ios::app);
 	if (myFile.is_open())
 	{
-		myFile << "PLA" << " " << mScoreKeeper.mScore<<endl;
+		myFile << "PLA" << " " << mScoreKeeper.mScore;
 		myFile.close();
 	}
 	else
