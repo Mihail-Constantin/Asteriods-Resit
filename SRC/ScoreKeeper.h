@@ -11,6 +11,7 @@
 class ScoreKeeper : public IGameWorldListener
 {
 public:
+	int mScore;
 	ScoreKeeper() { mScore = 0; }
 	virtual ~ScoreKeeper() {}
 
@@ -39,7 +40,7 @@ public:
 	}
 
 private:
-	int mScore;
+
 
 	typedef std::list< shared_ptr<IScoreListener> > ScoreListenerList;
 

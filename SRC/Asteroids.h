@@ -56,6 +56,7 @@ private:
 	shared_ptr<GUILabel> StartLabel;
 	shared_ptr<GUILabel> HighScoreLabel;
 	shared_ptr<GUILabel> QuitLabel;
+	shared_ptr<GUILabel> HighScoreTable;
 
 	uint mLevel;
 	uint mAsteroidCount;
@@ -68,7 +69,9 @@ private:
 	shared_ptr<GameObject> CreateSpaceship();
 	void CreateGUI();
 	void CreateAsteroids(const uint num_asteroids);
+	void CreateHighScoreGUI();
 	shared_ptr<GameObject> CreateExplosion();
+	void WriteScoreToFIle();
 	
 	const static uint SHOW_GAME_OVER = 0;
 	const static uint START_NEXT_LEVEL = 1;

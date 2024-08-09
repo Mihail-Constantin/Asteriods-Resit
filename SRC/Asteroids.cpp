@@ -11,7 +11,9 @@
 #include "BoundingSphere.h"
 #include "GUILabel.h"
 #include "Explosion.h"
-
+#include <iostream>
+#include <fstream>
+#include <string>
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
 /** Constructor. Takes arguments from command line, just in case. */
@@ -60,7 +62,7 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 		GameStart();
 		break;
 	case '2':
-
+		CreateHighScoreGUI();
 		break;
 	case '3':
 		Stop();
@@ -183,6 +185,35 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 	}
 }
 
+void Asteroids::CreateHighScoreGUI()
+{
+	std::ifstream myFile("HighScore.txt");
+	std::string helper;
+	std::string highScoreTable;
+	if (myFile.is_open())
+	{
+		while (std::getline(myFile, helper))
+		{
+			helper.append("\n");
+			highScoreTable.append(helper);
+		}
+	}
+
+	//Create the High Score Table
+	mGameDisplay->GetContainer()->SetBorder(GLVector2i(20, 20));
+	HighScoreTable = make_shared<GUILabel>(highScoreTable);
+	HighScoreTable->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	HighScoreTable->SetSize(10);
+	shared_ptr<GUIComponent> high_score_component = static_pointer_cast<GUIComponent>(HighScoreTable);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component, GLVector2f(0.3f, 0.5f));
+	StartLabel->SetVisible(false);
+	HighScoreLabel->SetVisible(false);
+	QuitLabel->SetVisible(false);
+	
+	
+
+}
+
 void Asteroids::CreateGUI()
 {
 	// Add a (transparent) border around the edge of the game display
@@ -293,6 +324,7 @@ void Asteroids::GameStart()
 	StartLabel->SetVisible(false);
 	HighScoreLabel->SetVisible(false);
 	QuitLabel->SetVisible(false);
+	HighScoreTable->SetVisible(false);
 	GameSession::Start();
 }
 
@@ -303,7 +335,9 @@ void Asteroids::Quit()
 
 void Asteroids::ShowHighScoreTable()
 {
+	CreateHighScoreGUI();
 }
+
 
 
 void Asteroids::OnScoreChanged(int score)
@@ -337,8 +371,26 @@ void Asteroids::OnPlayerKilled(int lives_left)
 	else
 	{
 		SetTimer(500, SHOW_GAME_OVER);
+		WriteScoreToFIle();
+
 	}
 }
+
+void Asteroids::WriteScoreToFIle()
+{
+	std::ofstream myFile("HighScore.txt");
+	if (myFile.is_open())
+	{
+		myFile << "PLA" << " " << mScoreKeeper.mScore<<endl;
+		myFile.close();
+	}
+	else
+	{
+		std::cerr << "Unable to open file" << std::endl;
+	}
+
+}
+
 
 shared_ptr<GameObject> Asteroids::CreateExplosion()
 {
