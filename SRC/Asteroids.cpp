@@ -22,6 +22,7 @@ Asteroids::Asteroids(int argc, char *argv[])
 	mAsteroidCount = 0;
 }
 
+
 /** Destructor. */
 Asteroids::~Asteroids(void)
 {
@@ -34,45 +35,8 @@ void Asteroids::Start()
 {
 	// Create a shared pointer for the Asteroids game object - DO NOT REMOVE
 	shared_ptr<Asteroids> thisPtr = shared_ptr<Asteroids>(this);
-
-	// Add this class as a listener of the game world
-	mGameWorld->AddListener(thisPtr.get());
-
-	// Add this as a listener to the world and the keyboard
 	mGameWindow->AddKeyboardListener(thisPtr);
-
-	// Add a score keeper to the game world
-	mGameWorld->AddListener(&mScoreKeeper);
-
-	// Add this class as a listener of the score keeper
-	mScoreKeeper.AddListener(thisPtr);
-
-	// Create an ambient light to show sprite textures
-	GLfloat ambient_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat diffuse_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
-	glEnable(GL_LIGHT0);
-
-	Animation *explosion_anim = AnimationManager::GetInstance().CreateAnimationFromFile("explosion", 64, 1024, 64, 64, "explosion_fs.png");
-	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
-	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
-
-	// Create a spaceship and add it to the world
-	mGameWorld->AddObject(CreateSpaceship());
-	// Create some asteroids and add them to the world
-	CreateAsteroids(10);
-
-	//Create the GUI
-	CreateGUI();
-
-	// Add a player (watcher) to the game world
-	mGameWorld->AddListener(&mPlayer);
-
-	// Add this class as a listener of the player
-	mPlayer.AddListener(thisPtr);
-
-	// Start the game
+	CreateMenuGUI();
 	GameSession::Start();
 }
 
@@ -91,6 +55,15 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 	{
 	case ' ':
 		mSpaceship->Shoot();
+		break;
+	case '1':
+		GameStart();
+		break;
+	case '2':
+
+		break;
+	case '3':
+		Stop();
 		break;
 	default:
 		break;
@@ -245,6 +218,93 @@ void Asteroids::CreateGUI()
 	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.5f, 0.5f));
 
 }
+
+void Asteroids::CreateMenuGUI()
+{
+	// Add a transparent border around the edge of the game display
+	mGameDisplay->GetContainer()->SetBorder(GLVector2i(20, 20));
+	// Creating the GUI for the Start label which will act like a button
+	StartLabel = make_shared<GUILabel>("1:Start Game");
+	StartLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	StartLabel->SetSize(10);
+	shared_ptr<GUIComponent> start_component = static_pointer_cast<GUIComponent>(StartLabel);
+	mGameDisplay->GetContainer()->AddComponent(start_component, GLVector2f(0.35f, 0.6f));
+
+	//Creating the GUI for the High Score Table label which will act like a button
+	HighScoreLabel = make_shared<GUILabel>("2:High Score Table");
+	HighScoreLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	HighScoreLabel->SetSize(10);
+
+	shared_ptr<GUIComponent> high_score_table_component = static_pointer_cast<GUIComponent>(HighScoreLabel);
+	mGameDisplay->GetContainer()->AddComponent(high_score_table_component, GLVector2f(0.3f, 0.5f));
+
+	//Creating the GUI for the Quit label which will act like a button
+	QuitLabel = make_shared<GUILabel>("3:Quit");
+	QuitLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	QuitLabel->SetSize(10);
+
+	shared_ptr<GUIComponent> quit_component = static_pointer_cast<GUIComponent>(QuitLabel);
+	mGameDisplay->GetContainer()->AddComponent(quit_component, GLVector2f(0.43f, 0.4f));
+}
+
+void Asteroids::GameStart()
+{
+	// Create a shared pointer for the Asteroids game object - DO NOT REMOVE
+	shared_ptr<Asteroids> thisPtr = shared_ptr<Asteroids>(this);
+
+	// Add this class as a listener of the game world
+	mGameWorld->AddListener(thisPtr.get());
+
+	// Add this as a listener to the world and the keyboard
+	mGameWindow->AddKeyboardListener(thisPtr);
+
+	// Add a score keeper to the game world
+	mGameWorld->AddListener(&mScoreKeeper);
+
+	// Add this class as a listener of the score keeper
+	mScoreKeeper.AddListener(thisPtr);
+
+	// Create an ambient light to show sprite textures
+	GLfloat ambient_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat diffuse_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
+	glEnable(GL_LIGHT0);
+
+	Animation* explosion_anim = AnimationManager::GetInstance().CreateAnimationFromFile("explosion", 64, 1024, 64, 64, "explosion_fs.png");
+	Animation* asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
+	Animation* spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
+
+	// Create a spaceship and add it to the world
+	mGameWorld->AddObject(CreateSpaceship());
+	// Create some asteroids and add them to the world
+	CreateAsteroids(10);
+
+	//Create the GUI
+	CreateGUI();
+
+	// Add a player (watcher) to the game world
+	mGameWorld->AddListener(&mPlayer);
+
+	// Add this class as a listener of the player
+	mPlayer.AddListener(thisPtr);
+
+	// Start the game
+	StartLabel->SetVisible(false);
+	HighScoreLabel->SetVisible(false);
+	QuitLabel->SetVisible(false);
+	GameSession::Start();
+}
+
+void Asteroids::Quit()
+{
+	GameSession::Stop();
+}
+
+void Asteroids::ShowHighScoreTable()
+{
+}
+
 
 void Asteroids::OnScoreChanged(int score)
 {
